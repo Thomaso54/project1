@@ -1,0 +1,50 @@
+#!/bin/bash
+
+#apache-install Apache Install Script
+#CIT-470 Advanced Network & System Administration
+#Spring 2020
+#Group 3 Project 1
+#Kevin Irwin, Garrett Turin, Thomas Ryan
+
+# Install Apache and ssl
+  echo "Installing Apache" | tee -a /root/apache-install.log  
+  yum -y install openssl >> /root/apache-install.log 2>&1
+  yum -y install mod_ssl >> /root/apache-install.log 2>&1
+  yum -y install httpd >> /root/apache-install.log 2>&1
+  echo "Apache install complete, please wait while we configure a few things." | tee -a /root/apache-install.log
+  
+#Punch holes in the firewall
+  echo "Punching holes in the firewall" | tee -a /root/apache-install.log
+  service firewalld start >> /root/apache-install.log 2>&1
+  sudo firewall-cmd --permanent --add-port=443/tcp >> /root/apache-install.log 2>&1  
+  sudo firewall-cmd --permanent --add-port=80/tcp >> /root/apache-install.log 2>&1
+  sudo firewall-cmd --reload
+  echo "Firewall open" | tee -a /root/apache-install.log
+
+#Generate keys  
+  echo "Generating Keys" | tee -a /root/apache-install.log
+  mkdir -p /etc/ssl/private >> /root/apache-install.log 2>&1
+  chmod 700 /etc/ssl/private >> /root/apache-install.log 2>&1
+  cd /etc/ssl/private >> /root/apache-install.log 2>&1
+  openssl genrsa -out server.key 2048 >> /root/apache-install.log 2>&1
+  openssl req -new -key server.key -subj "/C=US/ST=Kentucky/L=Highland Heights/O=NKU/CN=$HOSTNAME " -out server.csr >> /root/apache-install.log 2>&1
+  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt >> /root/apache-install.log 2>&1
+  echo "I have keys, I feel so grown up" | tee -a /root/apache-install.log
+  cd /var/www/html >> /root/apache-install.log 2>&1
+
+#Configure User directories
+cd /home
+for dir in *; do mkdir "$dir/public_html"; done
+cd ..
+chmod 755 -R /home
+#yes | cp -R /root/httpd.conf /etc/httpd/conf/httpd.conf
+#yes | cp -R /root/.htaccess /var/www/html/
+#yes | cp -R /root/userdir.conf /etc/httpd/conf.d/userdir.conf
+#yes | cp -R /root/ssl.conf /etc/httpd/conf.d/userdir.conf
+cd root/
+ls
+
+#start apache
+  cd /usr/sbin >> /root/apache-install.log 2>&1
+  ./apachectl start >> /root/apache-install.log 2>&1
+echo "Try it now!" | tee -a /root/apache-install.log
