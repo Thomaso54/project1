@@ -4,3 +4,11 @@ Group 3 Project 1
 Kevin Irwin, Garrett Turin, Thomas Ryan
 
 apache_install script to install and configure apache
+
+.htaccess to allow user to access site through ip/~username or ip/users/username
+
+httpd.conf for custom httpd file to replace the default httpd.configure
+
+usrdir.conf to allow for public_html and replace default userdir.configure
+
+ssl.conf to allow for ssl access to server
